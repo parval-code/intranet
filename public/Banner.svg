@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2326" height="736" viewBox="0 0 2326 736">
+  <defs>
+    <style>
+      .cls-1, .cls-3 {
+        opacity: 0.9;
+      }
+
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-2 {
+        clip-path: url(#clip-path);
+      }
+
+      .cls-3 {
+        fill: url(#linear-gradient-2);
+      }
+
+      .cls-4 {
+        fill: rgba(0,0,0,0.09);
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#f3b90e"/>
+      <stop offset="1" stop-color="#778090"/>
+    </linearGradient>
+    <clipPath id="clip-path">
+      <rect id="sisze_cover" data-name="sisze cover" class="cls-1" width="2326" height="736" rx="15" transform="translate(0.086 -168.3)"/>
+    </clipPath>
+    <linearGradient id="linear-gradient-2" x1="0.314" y1="0.295" x2="0.798" y2="0.577" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#f3b90e"/>
+      <stop offset="0.516" stop-color="#b79d4d"/>
+      <stop offset="1" stop-color="#878e99"/>
+    </linearGradient>
+  </defs>
+  <g id="Banner" transform="translate(-0.456 93.45)">
+    <g id="Grupo_4" data-name="Grupo 4" class="cls-2" transform="translate(0.37 74.85)">
+      <rect id="Rectángulo_149" data-name="Rectángulo 149" class="cls-3" width="2326" height="1329" rx="15" transform="translate(0.086 -248.3)"/>
+      <ellipse id="Elipse_37" data-name="Elipse 37" class="cls-4" cx="461.5" cy="443" rx="461.5" ry="443" transform="translate(-231.913 -121.3)"/>
+      <ellipse id="Elipse_38" data-name="Elipse 38" class="cls-4" cx="538.5" cy="516.5" rx="538.5" ry="516.5" transform="translate(1184.087 -295.3)"/>
+    </g>
+  </g>
+</svg>

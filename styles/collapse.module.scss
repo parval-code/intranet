@@ -1,0 +1,233 @@
+.main{
+    background-color: rgb(241, 243, 249);
+    min-height: 100vh;
+    margin-left: 250px;
+    .mainWrapper{
+        padding: 20px;
+        gap: 40px;
+    }
+}
+// open or closed body style //
+.mainOpen{
+    // width:100%;
+}
+
+.mainClouse{
+    width: 94%;
+    position: absolute;
+    left: -186px;
+}
+
+
+
+// open or closed sidebar style //
+.navOpen{
+    width:225px;
+
+    .iconArrowOpen{
+        position: relative;
+        left: 24px;
+        bottom: 6px;
+        display: flex;
+        i{
+            font-size: 24px;
+            position: relative;
+            bottom: 8px;
+            left: 10px;
+        }
+    }
+}
+
+.navClouse{
+    width:61px;
+
+    .iconArrowOpen{
+        display: none;
+    }
+    .titleMenu{
+        display: none;
+    }
+
+}
+
+// styles for navbar
+.Navbar{
+    transition: width 0.2s;
+    overflow: hidden;
+    // position: fixed;
+    height: 100vh;
+    background-color: #fff;
+    box-shadow: 0 12px 13px #BBCDE029;
+    .logo{
+        position: relative;
+        top: 15px;
+        right: 9px;
+        text-align: center;
+        margin-left: 14px;
+    }
+
+    // Style title categori P
+    p{
+        margin-bottom: 0;
+        padding-left: 20px;
+        font-weight: 400;
+    }
+
+    .boxLine{
+        padding: 0 17px 0 17px;
+        hr{
+            border-top: 1px #8b919c solid;
+        }
+    }
+    .wrapper{
+        overflow: scroll;
+        height: 492px;
+        z-index: 1;
+        ul{
+            margin-top: 20px;
+            text-align: left;
+            padding: 0;
+            margin-left: 16px;
+
+            // padding-left: 10px;
+            // display: flex;
+            // gap: 35px;
+            overflow: hidden;
+            // flex-direction: column;
+            font-size: 16px;
+            li{
+                width:100px;
+                word-wrap: break-word;
+                list-style: none;
+                cursor: pointer;
+                margin-bottom:25px;
+
+                i{
+                    color: #2c4163e1;
+                    font-size: 20px;
+                    position: relative;
+
+                }
+                // opacity: .6;
+                a{
+                    text-decoration: none;
+                    color: #2c4163e1;
+                    position: relative;
+                    left: 6px;
+                    top: 4px;
+                }
+
+                a:hover{
+                    color: #cf9e0c !important;
+                }
+            }
+        }
+    }
+
+    .footerBar{
+    padding: 10px;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+    font-size: 16px;
+
+
+
+    }
+}
+
+
+
+// style navbar for mobil //
+.navMobil{
+    .contentItemMobil{
+        background-color: rgb(255, 255, 255);
+        box-shadow: 0 12px 13px #bbcde0a6;
+        position: fixed;
+         width: 300px;
+         height: 100vh;
+         z-index: 1;
+        //  ul responsive
+         ul{
+            margin-top: 41px;
+            text-align: left;
+            padding-left: 10px;
+            display: flex;
+            gap: 35px;
+            flex-direction: column;
+            font-size: 17px;
+            li{
+                list-style: none;
+                cursor: pointer;
+                i{
+                    color: #2c4163e1;
+                }
+                // opacity: .6;
+                a{
+                    text-decoration: none;
+                    color: #2c4163e1;
+                    position: relative;
+                    left: 6px;
+                    top: 4px;
+                }
+            }
+         }
+    }
+
+    .iconMobil{
+          font-size: 37px;
+          position: fixed;
+          right: 18px;
+    }
+}
+
+
+
+@media only screen and (min-width:769px){
+    .navMobil{
+    display: none;
+    }
+}
+
+// for mobiles phone
+@media only screen and (max-width:768px){
+
+    // Navbar style for mobil
+    .Navbar{
+        display: none;
+        width: 70px;
+        p{
+            display: none;
+        }
+
+        ul{
+            gap: 0 !important;
+        }
+        li{
+            height: 70px;
+        }
+
+        a{
+            opacity: 0 !important;
+        }
+    }
+
+// header style for mobil
+.Header{
+    width: 100%;
+    margin-left: 70px;
+
+}
+
+// content style for mobil
+.main{
+    margin-left: 0;
+}
+
+// style width main for body in the movil//
+.mainClouse{
+    width: 100% !important;
+    position: inherit !important;
+}
+
+}

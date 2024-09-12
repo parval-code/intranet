@@ -1,0 +1,18 @@
+
+.colBackground{
+    background-image: url(../public/bg-ground.svg);
+    color: white;
+    filter: saturate(1.3);
+    padding: 40px;
+    min-height: 101vh;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+}
+
+
+@media only screen and (max-width: 766px){
+    .colBackground{
+        display: none;
+    }
+}
