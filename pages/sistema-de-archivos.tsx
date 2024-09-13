@@ -27,6 +27,8 @@ import {
     ArrowDownCircleIcon 
 } from '@heroicons/react/24/outline';
 import { WORDIcons, PDFIcons, XLSIcons } from '@/components/molecules/DesingIcons';
+import VerificatePermissions from  '@/utils/verificatePermissions';
+import Permissions from '@/utils/permissions';
 
 interface IFilePlus {
   name: string;
@@ -95,6 +97,7 @@ function IndexSistemaDeArchivos() {
   const [searchFolder, setSearchFolder] = useState('');
   const [filterDataFile, setFilterDataFile] = useState([]);
   const [filterDataFolder, setFilterDataFolder] = useState([]);
+  const [ permissionsValue, setPermissionsValue ] = useState(false);
  
   useEffect(() => {
     async function fetchData() {
@@ -313,7 +316,12 @@ function IndexSistemaDeArchivos() {
   useEffect(() => {
     if(!isEmpty(authLogin) && !isEmpty(departments)) {
         const category = departments.find((item: any) => item.manager === authLogin.id);
-        setCategorySelect(category.id);
+        if(!isEmpty(category)) {
+            setCategorySelect(category.id);
+        }
+     }
+     if(!isEmpty(authLogin.permissions)) {
+        setPermissionsValue(VerificatePermissions(get(authLogin, 'permissions', []), [Permissions.SISTEMA_ARCHIVOS_ADMINISTRADOR]))
      }
   }, [authLogin, departments]);
 
@@ -380,7 +388,7 @@ function IndexSistemaDeArchivos() {
                     <div className="lg:overflow-y-auto lg:border-l lg:border-white/5">
 
                         <ul role="list" className="divide-y divide-white/5">
-                            {orderedData.filter((key: any) => String(key) === String(categorySelect)).map((key: any) => (
+                            { (permissionsValue ? orderedData : orderedData.filter((key: any) => String(key) === String(categorySelect)) ).map((key: any) => (
                                 <li key={key} onClick={() => {
                                     setFileSelect(key)
                                     setFolderSelect('')
