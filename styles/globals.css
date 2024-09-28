@@ -60,3 +60,7 @@ body {
   transition: all 0.2s ease !important; /* Transición suave para cualquier cambio */
 
 }
+
+.webkit-center {
+  text-align: -webkit-center;
+}

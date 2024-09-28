@@ -47,7 +47,7 @@ const IconShow = (url: string) => {
         case 'jpg':
         case 'jpeg':
         case 'png':
-            icons = <PhotoIcon className={"mx-auto text-gray-400 h-8 w-8 hover:text-white rounded-full"} />
+            icons = <PhotoIcon className={"mx-auto text-gray-400 h-7 w-7 hover:text-parvalColor rounded-full"} />
             break;
         case 'pdf':
             icons = <PDFIcons h={'h-12'} w={'w-12'} classAditional={'bg-transparent'}  />
@@ -80,6 +80,8 @@ function IndexSistemaDeArchivos() {
   const [show, setShow] = useState(false);
   const [ reloadDelete, setReloadDelete ] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [NameRemove,  setNameRemove]= useState('');
   const [fileSelect, setFileSelect] = useState('');
   const [folderSelect, setFolderSelect] = useState('');
   const [ editFolderName, setEditFolderName] = useState('');
@@ -338,6 +340,7 @@ function IndexSistemaDeArchivos() {
           {/* codigo aqui */}
           <div className={"grid w-full"}>
             <div>
+                {/*  col header rut */}
                 <nav className="flex border-b border-gray-200 bg-white" aria-label="Breadcrumb">
                     <ol role="list" className="mx-auto flex w-full max-w-screen-xl space-x-4 px-4 sm:px-6 lg:px-8">
                         <li className="flex">
@@ -384,16 +387,18 @@ function IndexSistemaDeArchivos() {
                     </ol>
                 </nav>
             </div>
-            <div className="grid grid-cols-3 bg-gray-600 w-full" style={{ height: '86vh' }}>
-                    <div className="lg:overflow-y-auto lg:border-l lg:border-white/5">
-
+            
+            <div className="grid grid-cols-3 bg-white w-full" style={{ height: '86vh' }}>
+                
+                    {/* Col list deparment */}
+                    <div className="lg:overflow-y-auto lg:border-l ">
                         <ul role="list" className="divide-y divide-white/5">
                             { (permissionsValue ? orderedData : orderedData.filter((key: any) => String(key) === String(categorySelect)) ).map((key: any) => (
                                 <li key={key} onClick={() => {
                                     setFileSelect(key)
                                     setFolderSelect('')
                                     setListDocumentsSelect([]);
-                                }} style={{ cursor: 'pointer' }} className={`${fileSelect === key ? 'bg-gray-500' : ''} relative flex items-center space-x-4 px-4 py-4 sm:px-6 lg:px-8`}>
+                                }} style={{ cursor: 'pointer' }} className={`${fileSelect === key ? 'bg-gray-100' : ''} relative flex items-center space-x-4 px-4 py-4 sm:px-6 lg:px-8`}>
                                     <div className="min-w-0 flex-auto">
                                         <div className="flex items-center gap-3">
                                             {
@@ -404,24 +409,27 @@ function IndexSistemaDeArchivos() {
                                                         </div>
                                                     </> : null
                                             }
-                                            <h2 className="min-w-0 text-lg font-semibold leading-6 text-white">
+                                            <h2 className="min-w-0 text-[15px] leading-6 text-gray-800">
                                                 <span className="truncate">{ departments.length ? departments.find((item: any) => String(item.id) === String(key))?.name : 'Nombre no disponible' }</span>
+                                                <hr className='mt-3'/>
                                             </h2>
                                         </div>
                                     </div>
                                     {
                                         fileSelect === key ?
                                             <>
-                                                <svg className="h-5 w-5 flex-none text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                {/* <svg className="h-5 w-5 flex-none text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                                     <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-                                                </svg>
+                                                </svg> */}
                                             </> : null
                                     }
                                 </li>
                             ))}
                         </ul>
                     </div>
-                    <div className={"lg:overflow-y-auto lg:border-l lg:border-white/5"}>
+
+                    {/* Col list new folder */}
+                    <div className={"lg:overflow-y-auto lg:border-l"}>
                         {/* <header className="flex items-center justify-between border-b border-white/5 p-6">
                             <h2 className="text-sm font-semibold leading-7 text-white" style={{ height: '40px' }}> 
                                 { departments.length ? departments.find((item: any) => String(item.id) === String(fileSelect))?.name : 'Nombre no disponible' } 
@@ -454,8 +462,8 @@ function IndexSistemaDeArchivos() {
                                                             setListDocumentsSelect([]);
                                                         }}
                                                         disabled={fileSelect === ''}
-                                                        className={`mt-5 mr-5 md:mt-0 h-10 flex items-center text-white rounded bg-indigo-500 px-5 py-2 text-[14px] font-normal text-slate-700  hover:bg-indigo-600`}>
-                                                         <FolderPlusIcon className={"mx-auto text-gray-400 h-8 w-8 hover:text-white rounded-full"} />
+                                                        className={`mt-5 mr-5 md:mt-0 h-9 flex items-center text-gray-800 rounded bg-parvalColor px-5 py-2 text-[14px] font-normal hover:bg-parvalColor`}>
+                                                         <FolderPlusIcon className={"mx-auto text-gray-800 h-7 w-7 rounded-full"} />
                                                     </button>
                                                 </div>
                                             </div>
@@ -468,34 +476,43 @@ function IndexSistemaDeArchivos() {
                                         <li key={index} onClick={() => {
                                             setFolderSelect(item.name);
                                             setListDocumentsSelect(item.document);
-                                        }} style={{ cursor: 'pointer' }} className={`${item.name === folderSelect ? 'bg-gray-500' : ''} px-4 py-2 sm:px-6 lg:px-8`}>
+                                        }} style={{ cursor: 'pointer' }} className={`${item.name === folderSelect ? 'bg-gray-100' : ''} px-4 py-2 sm:px-6 lg:px-8`}>
                                             <div className="flex items-center gap-x-3">
                                                 {
                                                     item.name === folderSelect ?
                                                         <>
-                                                            <FolderOpenIcon className={"mx-auto text-gray-400 h-10 w-10 flex-shrink-0 rounded-full"} />
+                                                            <FolderOpenIcon className={"mx-auto text-parvalColor h-7 w-7 flex-shrink-0 rounded-full"} />
                                                         </> : <>
-                                                            <FolderIcon className={"mx-auto text-gray-400 h-10 w-10 flex-shrink-0 rounded-full"} />
+                                                            <FolderIcon className={"mx-auto text-gray-400 h-7 w-7 flex-shrink-0 rounded-full"} />
                                                         </>
                                                 }
                                                 
-                                                <h3 className="flex-auto truncate text-sm font-semibold leading-6 text-white"> { item.name } </h3>
-                                                <span className="flex-none text-xs text-gray-600">
+                                                <h3 className="flex-auto truncate text-sm leading-6 text-gray-800"> { item.name } </h3>
+                                                <span className="flex gap-5 text-xs text-gray-600">
 
-                                                    <PencilIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-white rounded-full"} onClick={() => setShowEdit(true)} style={{ cursor: 'pointer' }} />
+                                                    <PencilIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-green-400 rounded-full"} onClick={() => setShowEdit(true)} style={{ cursor: 'pointer' }} />
                                                     {
-                                                        !isEmpty(item.document) ? null : <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-white rounded-full"} onClick={() => removeItem(item.name, true)} style={{ cursor: 'pointer' }} />
+                                                        <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-red-600 rounded-full"} onClick={() => {
+                                                            setShowDelete(true)
+                                                            setNameRemove(item.name)
+                                                        }} style={{ cursor: 'pointer' }} />
+                                                    }
+                                                    
+                                                    {
+                                                        // !isEmpty(item.document) ? null : <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-red-600 rounded-full"} onClick={() => removeItem(item.name, true)} style={{ cursor: 'pointer' }} />
                                                     }
 
                                                 </span>
                                             </div>
                                         </li>
                                     </>
-                                )) : <li className='flex justify-center'> <h3 className="truncate text-sm font-semibold leading-6 text-white"> Seleccione un departamento </h3> </li>
+                                )) : <li className='flex justify-center'> <h3 className="truncate text-sm font-semibold leading-6 text-gray-800"> Seleccione un departamento </h3> </li>
                             }
                         </ul>
                     </div>
-                    <div className={"lg:overflow-y-auto lg:border-l lg:border-white/5"}>
+
+                    {/* Col list new file */}
+                    <div className={"lg:overflow-y-auto lg:border-l"}>
                         {/* <header className="flex items-center justify-between border-b border-white/5 p-6">
                             <h2 className="text-sm font-semibold leading-7 text-white" style={{ height: '40px' }}>
                                 {departments.length ? departments.find((item: any) => String(item.id) === String(fileSelect))?.name : 'Nombre no disponible' } / { folderSelect } 
@@ -526,8 +543,8 @@ function IndexSistemaDeArchivos() {
                                                             setTypeFileSelect('file')
                                                         }}
                                                         disabled={fileSelect === ''}
-                                                        className={`mt-5 mr-5 md:mt-0 h-10 flex items-center text-white rounded bg-indigo-500 px-5 py-2 text-[14px] font-normal text-slate-700 hover:bg-indigo-600`}>
-                                                        <CloudArrowUpIcon className={"mx-auto text-gray-400 h-8 w-8 hover:text-white rounded-full"} />
+                                                        className={`mt-5 mr-5 md:mt-0 h-9 flex items-center  rounded bg-parvalColor px-5 py-2 text-[14px] font-normal text-slate-800`}>
+                                                        <CloudArrowUpIcon className={"mx-auto text-gray-700 h-7 w-7 "} />
                                                     </button>
                                                 </div>
                                             </div>
@@ -540,11 +557,11 @@ function IndexSistemaDeArchivos() {
                                 <>
                                      <li className="px-4 py-3 sm:px-6 lg:px-8">
                                         <div className={'flex items-center'}>
-                                            <svg aria-hidden="true" className="inline w-8 h-8 px-1 animate-spin text-white fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <svg aria-hidden="true" className="inline w-8 h-8 px-1 animate-spin text-gray-800 fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
                                                 <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
                                             </svg>
-                                            <span className='px-2 font-normal text-wrap text-white'>Processing...</span>
+                                            <span className='px-2 font-normal text-wrap text-gray-400'>Processing...</span>
                                         </div>
                                      </li>
                                 </> :
@@ -555,7 +572,7 @@ function IndexSistemaDeArchivos() {
                                                 <li className="px-4 py-3 sm:px-6 lg:px-8">
                                                     <div className="flex items-center gap-x-3">
                                                         { IconShow(item.url) }
-                                                        <h3 className="flex-auto truncate text-sm font-semibold leading-6 text-white text-ellipsis"> 
+                                                        <h3 className="flex-auto truncate text-sm leading-6 text-gray-800 text-ellipsis"> 
                                                             { item.name } 
                                                         </h3>
                                                         <a 
@@ -568,15 +585,15 @@ function IndexSistemaDeArchivos() {
                                                             }}
                                                             download={true}
                                                             >
-                                                            <EyeIcon className={"mx-auto text-gray-400 h-5 w-5 flex-shrink-0 hover:text-white rounded-full"} style={{ cursor: 'pointer' }} />
+                                                            <EyeIcon className={"mx-auto text-gray-400 h-5 w-5 flex-shrink-0 hover:text-green-500 rounded-full"} style={{ cursor: 'pointer' }} />
                                                         </a>
                                                         <span className="flex-none text-xs text-gray-600">
-                                                        <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-white rounded-full"} onClick={() => removeItem(item.name, false, item.url)} style={{ cursor: 'pointer' }} />
+                                                        <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-red-600 rounded-full"} onClick={() => removeItem(item.name, false, item.url)} style={{ cursor: 'pointer' }} />
                                                         </span>
                                                     </div>
                                                 </li>
                                             </> 
-                                        )) : <><li className='flex justify-center'> <h3 className="truncate text-sm font-semibold leading-6 text-white"> Seleccione un directorios </h3> </li></>
+                                        )) : <><li className='flex justify-center'> <h3 className="truncate text-sm font-semibold leading-6 text-gay-800"> Seleccione un directorios </h3> </li></>
                                     }
                                 </>    
                                 
@@ -598,14 +615,16 @@ function IndexSistemaDeArchivos() {
         <div className="isolate bg-white p-6">
           <div>
             <div className="px-4 sm:px-0">
-              <h3 className="text-base font-semibold text-gray-900">
-                Agregar {typeFileSelect === 'file' ? 'Archivo' : 'Carpeta'} a (
+              <h3 className="text-base font-medium text-gray-700">
+                Agregar  {typeFileSelect === 'file' ? 'Archivo' : 'Carpeta'} a  <br/>(
                     {departments.length ? departments.find((item: any) => String(item.id) === String(fileSelect))?.name : 'Nombre no disponible' })
               </h3>
+
               <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-500">
                 Este panel es tanto para agregar archivos y carpetas.
               </p>
             </div>
+            
             <hr className="p-4" />
             <div className="grid grid-cols-1 gap-4">
               <div>
@@ -618,7 +637,7 @@ function IndexSistemaDeArchivos() {
                     typeFileSelect === 'file' ? 'Nombre de archivo' : 'Nombre de carpeta'
                   }
                   id="name"
-                  className="block w-full rounded-md border-0 px-3.5 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="block w-full h-12 rounded-md border-0 px-3.5 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-parvalColor sm:text-sm sm:leading-6"
                 />
               </div>
               
@@ -685,6 +704,51 @@ function IndexSistemaDeArchivos() {
                 </> }
           </div>
         </div>
+      </ModalComponents>
+
+{/* Delete */}
+      <ModalComponents
+        isOpen={showDelete}
+        onClose={() => {
+            setShowDelete(false);
+        }}
+      >
+        <>
+            <div className="isolate bg-white p-6">
+                <div className="webkit-center px-4 pb-5 sm:px-0">
+                    <div className="text-base text-center text-gray-600">
+                        <p>Quieres eliminar el documento</p>
+                        <p className='text-gray-900 font-medium'>{NameRemove}</p>
+                    </div> 
+                    <div><TrashIcon className='h-12 mb-5 mt-5 text-red-600'/></div>
+                </div>
+                <div className="grid grid-cols-1 gap-4">
+                        <div className="flex justify-end">
+                            { preloading ?
+                                <>
+                                    <button type="button" className={`bg-parvalColor rounded  px-3 py-2 text-[14px] font-normal text-slate-700  hover:bg-yellow-500`} disabled>
+                                        <svg aria-hidden="true" className="inline w-8 h-8 px-1 text-gray-200 animate-spin dark:text-white fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                        </svg>
+                                        <span className='px-2 font-normal text-wrap'>Processing...</span>
+                                    </button>
+                                </> : <>
+                                    {
+                                        <Btn
+                                            label={"Eliminar"}
+                                            disabled={NameRemove === ''}
+                                            onClick={() => removeItem(NameRemove, true)}
+                                            size="mt-5 md:mt-0 h-10"
+                                            color={`${NameRemove === '' ? 'bg-gray-300' : 'bg-red-500 text-white' }`}
+                                        />
+                                    } 
+                                </> }
+                        </div>
+                </div>
+            </div>
+            
+        </>
       </ModalComponents>
 
       <ModalComponents

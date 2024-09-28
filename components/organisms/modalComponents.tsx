@@ -22,12 +22,12 @@ const ModalComponents: React.FC<ModalProps> = (props: ModalProps) => {
 
     return (
         <>
-            <div className={`fixed inset-0 flex p-2 items-start justify-center z-50 ${
+            <div className={`fixed inset-0 flex p-2 justify-center items-start z-50 ${
                 props.isOpen ? 'block' : 'hidden'
             }`}>
                 <div className="fixed inset-0 bg-black opacity-50" onClick={props.onClose}/>
-                    <div className="bg-white rounded-lg p-1 z-50 overflow-auto">
-                        <div className={'flex justify-end pb-4'}>
+                    <div className="bg-white rounded-lg p-1 z-50 overflow-auto w-auto md:w-[25%]">
+                        <div className={'flex justify-end'}>
                             <button
                                 className="hover:bg-gray-100 flex py-1 px-1 rounded"
                                 onClick={props.onClose}
