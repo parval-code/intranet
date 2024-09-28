@@ -404,7 +404,7 @@ function IndexSistemaDeArchivos() {
                                             {
                                                 fileSelect === key ?
                                                     <>
-                                                        <div className="flex-none rounded-full bg-gray-100/10 p-1 text-gray-500">
+                                                        <div className="flex-none relative bottom-1 rounded-full bg-gray-100/10 p-1 text-gray-500">
                                                             <div className="h-2 w-2 rounded-full bg-yellow-400" />
                                                         </div>
                                                     </> : null
