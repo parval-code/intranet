@@ -165,7 +165,7 @@ function ApprovalComponents() {
               <div>
                 <span 
                   style={{ cursor: 'pointer' }}
-                  className={`p-3 xl:mb-0 md:mb-0 mb-3 self-center cursor-pointer rounded-full pl-6 pr-6 ${StatusVacations.TODAS === selectCategory ? 'bg-parvalColor' : 'bg-gray-100'}`}
+                  className={`p-3 xl:mb-0 md:mb-0 mb-4 self-center cursor-pointer rounded-full pl-6 pr-6 ${StatusVacations.TODAS === selectCategory ? 'bg-parvalColor' : 'bg-gray-100'}`}
                   onClick={() => setSelectCategory(StatusVacations.TODAS)}>
                     Todas
                 </span>
