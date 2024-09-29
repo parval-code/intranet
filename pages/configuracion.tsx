@@ -10,11 +10,14 @@ import { useRouter } from "next/router";
 import DetailsFormUsers from  '@/components/organisms/detailsFormUsers';
 import { useMsal } from "@azure/msal-react";
 import { GetListUsers } from '@/utils/getListUsers';
+import { GetUserForEmail } from '@/utils/getUserForEmail';
 import { useStorePermissions } from '@/hooks/permissions/StoreProvider';
 import { useStoreUsersPermissions } from '@/hooks/usersPermissions/StoreProvider';
 import { useStorePerson } from '@/hooks/Person/StoreProvider';
 import { useStoreDepartments } from '@/hooks/Departments/StoreProvider';
 import { useStoreLocation } from '@/hooks/Location/StoreProvider';
+import { useStoreAssignedUserGroups } from "@/hooks/assignedUserGroups/StoreProvider";
+import { useAssignedUserGroups } from '@/hooks/assignedUserGroups';
 import { usePerson } from '@/hooks/Person';
 import { usePermissions } from '@/hooks/permissions';
 import { useLocation } from '@/hooks/Location';
@@ -39,8 +42,6 @@ function ConfiguracionComponents() {
   const [currentPage, setCurrentPage] = useState('Usuarios');
   const { accounts, instance } = useMsal();
   const [ loading, setLoading ] = useState(false);
-  const [listUsers, setListUsers] = useState([]);
-  const [listUsersFilter, setListUsersFilter] = useState([]);
   const [disabled, setDisabled] = useState(false);
   const [file, setFile] = useState(null);
   const [disabledPermissions, setDisabledPermissions] = useState(false);
@@ -51,6 +52,7 @@ function ConfiguracionComponents() {
   const [selectedPerson, setSelectedPerson]: any = useState({});
   const [ permissionsValue, setPermissionsValue ] = useState(false);
   const { showNotification } = useNotification();
+  const [ duplicate , setDuplicate ] = useState(false);
   const [ newUser, setNewUser ]: any = useState({
     userId: '',
     name: '',
@@ -120,6 +122,7 @@ function ConfiguracionComponents() {
   const router = useRouter();
 
   const { getAllPermissions, savePermissions } = usePermissions();
+  const { updatedAssignedUserGroups } = useAssignedUserGroups();
   const { getAllPersons, savePerson, updatedPerson } = usePerson();
   const { getAllLocation } = useLocation();
   const { getAllDepartments } = useDepartments();
@@ -146,16 +149,24 @@ function ConfiguracionComponents() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (!isEmpty(accounts)) {
-        GetListUsers(accounts[0], instance).then((res: any) => {
-          if (res && !isEmpty(res.value)) {
-            setListUsers(res.value);
+  const onSearchUserForEmail = async (email: string) => {
+    try {
+      await GetUserForEmail(accounts[0], instance, email).then((res: any) => {
+        if (res && !isEmpty(res.data)) {
+          setSelectedPerson(res.data);
+          const userExist = person.filter((item: any) => res.data.id === item.userId); 
+          if(!isEmpty(userExist)) {
+            setDuplicate(true);
+          } else {
+            setDuplicate(false);
           }
-        });
+        }
+      });
+    } catch(e) {
+      setSelectedPerson({});
+      console.log(e);
     }
-  }, [accounts, instance]);
-
+  }
 
   const onClosePermissions = () => {
     setNewPermissions({
@@ -238,7 +249,7 @@ function ConfiguracionComponents() {
       const info = usersPermissions.filter((item: any) => item.userId === selectedPerson.id);
 
       if(info.length) {
-        setSelectedPermissions(info);
+        setSelectedPermissions(info[0].permissions);
       }
 
     }
@@ -253,14 +264,6 @@ function ConfiguracionComponents() {
     setNewPermissions(newPermissions => ({...newPermissions, [name]: name === 'codePermission' ? modifyCode.toLocaleUpperCase() : value }));
   }
 
-  
-  useEffect(() => {
-    if(!isEmpty(person) && !isEmpty(listUsers)) {
-      const userIds = person.map((item: any) => item.userId);
-      const filteredB = listUsers.filter((item: any) => userIds.includes(item.id));
-      setListUsersFilter(filteredB);
-    }
-  }, [person, listUsers])
 
   useEffect(() => {
     if(!isEmpty(authLogin.permissions)) {
@@ -332,8 +335,8 @@ function ConfiguracionComponents() {
 
             <main className="bg-[#F8FAFC] px-12 py-5 overflow-y-auto h-screen sm:px-6 lg:flex-auto">
               {currentPage === 'Usuarios' && <UserPermis 
-                                                setSelectedPermissions={setSelectedPermissions} 
-                                                people={listUsersFilter}
+                                                setSelectedPermissions={setSelectedPermissions}
+                                                onSearchUserForEmail={onSearchUserForEmail}
                                                 clearInfoData={clearInfo}
                                                 newUser={newUser}
                                                 newUserPermissions={authLogin && VerificatePermissions(get(authLogin, 'permissions', []), [Permissions.ADMINISTRADOR, Permissions.SUPER_ADMINISTRADOR])}
@@ -341,11 +344,11 @@ function ConfiguracionComponents() {
                                                 showEditUser={setShowInfo}
                                                 setFile={setFile}
                                                 disabled={disabled}
+                                                duplicate={duplicate}
                                                 setNewUser={setNewUser}
                                                 crearPermissionsUsers={onHandleSaveUserPermissions}
                                                 listUsersPermissions={person && person.length ? person : []}
                                                 selectedPerson={selectedPerson}
-                                                setSelectedPerson={setSelectedPerson}
                                                 selectedPermissions={selectedPermissions}
                                                 permissions={permissions}
                                                 departments={departments && departments.length ? departments : []}
@@ -391,6 +394,7 @@ function ConfiguracionComponents() {
               permissions={permissions}
               departments={departments}
               selectedPermissions={selectedPermissions}
+              updateUsersGroups={updatedAssignedUserGroups}
               location={location && location.length? location : []}
               updatedPerson={updatedPerson}
               updateUsersPermissions={updateUsersPermissions}

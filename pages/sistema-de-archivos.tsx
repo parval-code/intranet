@@ -4,8 +4,6 @@ import { get } from 'lodash';
 import ModalComponents from '@/components/organisms/modalComponents';
 import Loading from '@/components/molecules/loading';
 import Btn from '@/components/atoms/btn';
-import { Document, Page  } from '@react-pdf/renderer';
-import Image from "next/image";
 import { isEmpty } from 'lodash';
 import { useDepartments } from '@/hooks/Departments'; 
 import { useStoreDepartments } from "@/hooks/Departments/StoreProvider";
@@ -24,16 +22,18 @@ import {
     CloudArrowUpIcon, 
     PhotoIcon,
     PencilIcon,
-    ArrowDownCircleIcon 
+    LockClosedIcon,
+    ArrowDownCircleIcon
 } from '@heroicons/react/24/outline';
 import { WORDIcons, PDFIcons, XLSIcons } from '@/components/molecules/DesingIcons';
-import VerificatePermissions from  '@/utils/verificatePermissions';
+import VerificatePermissions, { VerificateEnabledGroup } from  '@/utils/verificatePermissions';
 import Permissions from '@/utils/permissions';
 
 interface IFilePlus {
   name: string;
   url?: string;
   document?: IFilePlus[];
+  permissions?: any[];
   type: 'file' | 'folder';
 }
 
@@ -67,21 +67,20 @@ const IconShow = (url: string) => {
         return icons;
     }
   };
-  
 
 function IndexSistemaDeArchivos() {
   
   const { getAllDepartments } = useDepartments();
-  const { getAllFileSystemDepartments, updateFileSystemDepartments } = useFileSystemDepartments();
+  const { getAllFileSystemDepartments, updateFileSystemDepartments, sendNotificationFileSystemDepartments } = useFileSystemDepartments();
   const { getAuthLogin } = useAuthLogin();
   const [ categorySelect, setCategorySelect] = useState(0);
   const { authLogin } = useStoreAuthLogin();
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
+  const [ modalPdf, setModalPdf ] = useState(false);
   const [ reloadDelete, setReloadDelete ] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
-  const [NameRemove,  setNameRemove]= useState('');
   const [fileSelect, setFileSelect] = useState('');
   const [folderSelect, setFolderSelect] = useState('');
   const [ editFolderName, setEditFolderName] = useState('');
@@ -89,18 +88,38 @@ function IndexSistemaDeArchivos() {
   const [listDocumentsSelect, setListDocumentsSelect]: any = useState([]);
   const [fileName, setFileName] = useState('');
   const [data, setData]: any = useState([]);
+  const [NameRemove,  setNameRemove]= useState('');
   const { departments } = useStoreDepartments() || [];
   const { fileSystemDepartments } = useStoreFileSystemDepartments() || [];
   const [permissions, setPermissions] = useState([]);
   const [file, setFile]: any = useState(null);
   const [previewURL, setPreviewURL] = useState<string | null>(null);
   const [preloading, setPreloading] = useState(false);
+  const [loadingMakeFolders, setLoadingMakeFolders] = useState(false);
   const [searchFile, setSearchFile] = useState('');
   const [searchFolder, setSearchFolder] = useState('');
   const [filterDataFile, setFilterDataFile] = useState([]);
   const [filterDataFolder, setFilterDataFolder] = useState([]);
   const [ permissionsValue, setPermissionsValue ] = useState(false);
- 
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [options, setOptions] = useState<string[]>([
+    'STAFF',
+    'SENIOR',
+    'MANAGER',
+    'SENIOR MANAGER',
+    'DIRECTOR'
+  ]);
+
+  const handleSelect = (item: string) => {
+    setSelectedItems([...selectedItems, item]);
+    setIsOpen(false);
+  };
+
+  const handleRemove = (item: string) => {
+    setSelectedItems(selectedItems.filter(selected => selected !== item));
+  };
+
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
@@ -116,7 +135,7 @@ function IndexSistemaDeArchivos() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+  
   useEffect(() => {
     if(searchFile !== '') {
         const infoFilter = listDocumentsSelect.filter((item: any) => item.name.toLowerCase().includes(searchFile.toLowerCase()))
@@ -192,24 +211,39 @@ function IndexSistemaDeArchivos() {
                     }
                 }          
       } else {
-            updatedData[fileSelect].push({
-            name: fileName,
-            type: 'folder',
-            document: [],
-        });
+            try {
+                setLoadingMakeFolders(true);
+                updatedData[fileSelect].push({
+                    name: fileName,
+                    type: 'folder',
+                    permissions: selectedItems,
+                    document: [],
+                });
+                onUpdateFileSystem().then(async (res: any) => {
+                    console.log(res)
+                    if(res.success) {
+                        console.log(res.data, 'res.data', res)
+                        await sendNotificationFileSystemDepartments({ name: fileName, departament: fileSelect, grupos: selectedItems })
+                    }
+                });
+            } catch(e) {
+                console.log(e)
+            }
+            
       }
     setShow(false);
     setPreloading(false);
     setFileName('');
     setData(updatedData);
     setFile(null);
+    setSelectedItems([]);
   };
 
   const removeItem = async (itemName: string, isFolder: boolean, url?:string) => {
     const updatedData = { ...data };
     setReloadDelete(true);
     try {
-        if (!folderSelect) {
+        if (isFolder) {
             // Si estamos en el directorio principal
             const indexToRemove = updatedData[fileSelect].findIndex(
               (item: IFilePlus) => item.name === itemName && item.type === (isFolder ? 'folder' : 'file')
@@ -242,18 +276,28 @@ function IndexSistemaDeArchivos() {
                   }
               }
           }
-          
-          setData(updatedData);
-          await axios.post(`/api/removeazureBlobStorage`, { filePath: url }).then(async () => {
-              await onUpdateFileSystem();
-          });
+
+          if(isFolder) {
+            setData(updatedData);
+            await onUpdateFileSystem();
+          } else {
+            const info = await axios.post(`/api/removeazureBlobStorage`, { filePath: url });
+            if(info.data.success) {
+                setData(updatedData);
+                await onUpdateFileSystem();
+            }
+          }
+        setReloadDelete(false);
+        setShowDelete(false);
+        setNameRemove('');
+        setFolderSelect('');
     } catch (e) {
         console.log(e)
     }
 
     setReloadDelete(false);
   };
-  
+
   const handlePreloaderImage = async (event: any) => {
         setFile(event.target.files[0]);
         setPreviewURL(URL.createObjectURL(event.target.files[0]));
@@ -281,12 +325,15 @@ function IndexSistemaDeArchivos() {
                 setPreloading(false);
                 setShow(false);
                 setFileName('');
+                setLoadingMakeFolders(false);
             });
+            return { success: true }
         } catch(e) {
             console.log(e);
             setFile(null);
             setPreviewURL(null);
             setPreloading(false);
+            setLoadingMakeFolders(false);
         }
         
     }
@@ -302,6 +349,7 @@ function IndexSistemaDeArchivos() {
       
           if (folderIndex !== -1) {
             updatedData[fileSelect][folderIndex].name = newFolderName;
+            // updatedData[fileSelect][folderIndex].permissions = selectedItems;
           }
         }
         setData(updatedData);
@@ -387,13 +435,14 @@ function IndexSistemaDeArchivos() {
                     </ol>
                 </nav>
             </div>
-            
+
             <div className="grid grid-cols-3 bg-white w-full" style={{ height: '86vh' }}>
-                
+
                     {/* Col list deparment */}
                     <div className="lg:overflow-y-auto lg:border-l ">
                         <ul role="list" className="divide-y divide-white/5">
-                            { (permissionsValue ? orderedData : orderedData.filter((key: any) => String(key) === String(categorySelect)) ).map((key: any) => (
+                            {/* start categories */}
+                            { (permissionsValue ? orderedData : orderedData.filter((key: any) => String(key) === String(categorySelect))).map((key: any) => (
                                 <li key={key} onClick={() => {
                                     setFileSelect(key)
                                     setFolderSelect('')
@@ -425,6 +474,7 @@ function IndexSistemaDeArchivos() {
                                     }
                                 </li>
                             ))}
+                            {/* end categories */}
                         </ul>
                     </div>
 
@@ -435,6 +485,7 @@ function IndexSistemaDeArchivos() {
                                 { departments.length ? departments.find((item: any) => String(item.id) === String(fileSelect))?.name : 'Nombre no disponible' } 
                             </h2>
                         </header> */}
+                        {/* start  folders categories */}
                         <ul role="list" className="divide-y divide-white/5">
                             <li className={"p-2"}> 
                                 {
@@ -471,44 +522,88 @@ function IndexSistemaDeArchivos() {
                                 }
                             </li>
                             {
-                            fileSelect ? (searchFolder !== '' ? filterDataFolder : data[fileSelect]).map((item: IFilePlus, index: number) => (
-                                    <>
-                                        <li key={index} onClick={() => {
-                                            setFolderSelect(item.name);
-                                            setListDocumentsSelect(item.document);
-                                        }} style={{ cursor: 'pointer' }} className={`${item.name === folderSelect ? 'bg-gray-100' : ''} px-4 py-2 sm:px-6 lg:px-8`}>
-                                            <div className="flex items-center gap-x-3">
-                                                {
-                                                    item.name === folderSelect ?
-                                                        <>
-                                                            <FolderOpenIcon className={"mx-auto text-parvalColor h-7 w-7 flex-shrink-0 rounded-full"} />
-                                                        </> : <>
-                                                            <FolderIcon className={"mx-auto text-gray-400 h-7 w-7 flex-shrink-0 rounded-full"} />
-                                                        </>
-                                                }
-                                                
-                                                <h3 className="flex-auto truncate text-sm leading-6 text-gray-800"> { item.name } </h3>
-                                                <span className="flex gap-5 text-xs text-gray-600">
-
-                                                    <PencilIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-green-400 rounded-full"} onClick={() => setShowEdit(true)} style={{ cursor: 'pointer' }} />
+                                loadingMakeFolders ?
+                                <>
+                                    <div className={'flex justify-center'}>
+                                        <svg aria-hidden="true" className="inline w-8 h-8 px-1 text-gray-200 animate-spin dark:text-white fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                        </svg>
+                                        <span className='px-2 font-normal text-wrap'>Processing...</span> 
+                                    </div>
+                                </> : <>
+                                    {
+                                        fileSelect ? (searchFolder !== '' ? filterDataFolder : data[fileSelect]).map((item: IFilePlus, index: number) => (
+                                                <>
                                                     {
-                                                        <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-red-600 rounded-full"} onClick={() => {
-                                                            setShowDelete(true)
-                                                            setNameRemove(item.name)
-                                                        }} style={{ cursor: 'pointer' }} />
+                                                        VerificateEnabledGroup(!isEmpty(authLogin.group) ? get(authLogin, 'group', []) : [''], get(item, 'permissions', [''])) ?
+                                                            <>
+                                                                    <li key={index} onClick={() => {
+                                                                    setFolderSelect(item.name);
+                                                                    setListDocumentsSelect(item.document);
+                                                                    }} style={{ cursor: 'pointer' }} className={`${item.name === folderSelect ? 'bg-gray-100' : ''} px-4 py-2 sm:px-6 lg:px-8`}>
+                                                                        <>
+                                                                            {
+                                                                                showDelete && item.name === NameRemove ? 
+                                                                                    <div className="flex items-center gap-x-3 bg-gray-200 px-4 py-2 sm:px-6 lg:px-8">
+                                                                                        <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-red-600 rounded-full"} onClick={() => {
+                                                                                            removeItem(item.name, true)
+                                                                                        }} style={{ cursor: 'pointer' }} />   
+                                                                                    </div> :
+                                                                                    <div className="flex items-center gap-x-3">
+                                                                                        {
+                                                                                            item.name === folderSelect ?
+                                                                                                <>
+                                                                                                    <FolderOpenIcon className={"mx-auto text-parvalColor h-7 w-7 flex-shrink-0 rounded-full"} />
+                                                                                                </> : <>
+                                                                                                    <FolderIcon className={"mx-auto text-gray-400 h-7 w-7 flex-shrink-0 rounded-full"} />
+                                                                                                </>
+                                                                                        }
+
+                                                                                        <h3 className="flex-auto truncate text-sm leading-6 text-gray-800"> { item.name } </h3>
+                                                                                        <span className="flex gap-5 text-xs text-gray-600">
+
+                                                                                            <PencilIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-green-400 rounded-full"} onClick={() => setShowEdit(true)} style={{ cursor: 'pointer' }} />
+                                                                                            {
+                                                                                                !isEmpty(item.document) ? null :
+                                                                                                    <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-red-600 rounded-full"} onClick={() => {
+                                                                                                        setShowDelete(true)
+                                                                                                        setNameRemove(item.name);
+                                                                                                    }} style={{ cursor: 'pointer' }} />
+                                                                                            }                                            
+                                                                                        </span>
+                                                                                    </div>
+                                                                            }
+                                                                        </>
+                                                                    </li>
+                                                                
+                                                                
+                                                            </> : <>
+                                                                <li key={index} className={'relative px-4 py-2 sm:px-6 lg:px-8 bg-gray-50'}>
+                                                                    <LockClosedIcon className="absolute left-1/2 transform -translate-x-1/2 mx-auto text-parvalColor h-7 w-7 flex-shrink-0 rounded-full" />
+                                                                
+                                                                    <div className="flex items-center gap-x-3">
+                                                                        {item.name === folderSelect ? (
+                                                                        <FolderOpenIcon className="mx-auto text-parvalColor h-7 w-7 flex-shrink-0 rounded-full" />
+                                                                        ) : (
+                                                                        <FolderIcon className="mx-auto text-gray-400 h-7 w-7 flex-shrink-0 rounded-full" />
+                                                                        )}
+                                                                        <h3 className="flex-auto truncate text-sm leading-6 text-gray-800">
+                                                                        {item.name}
+                                                                        </h3>
+                                                                    </div>
+                                                                </li>
+                                                            </>
+
                                                     }
                                                     
-                                                    {
-                                                        // !isEmpty(item.document) ? null : <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-red-600 rounded-full"} onClick={() => removeItem(item.name, true)} style={{ cursor: 'pointer' }} />
-                                                    }
-
-                                                </span>
-                                            </div>
-                                        </li>
-                                    </>
-                                )) : <li className='flex justify-center'> <h3 className="truncate text-sm font-semibold leading-6 text-gray-800"> Seleccione un departamento </h3> </li>
+                                                </>
+                                            )) : <li className='flex justify-center'> <h3 className="truncate text-sm font-semibold leading-6 text-gray-800"> Seleccione un departamento </h3> </li>
+                                    }
+                                </>
                             }
                         </ul>
+                        {/* end  folders categories */}
                     </div>
 
                     {/* Col list new file */}
@@ -518,6 +613,7 @@ function IndexSistemaDeArchivos() {
                                 {departments.length ? departments.find((item: any) => String(item.id) === String(fileSelect))?.name : 'Nombre no disponible' } / { folderSelect } 
                             </h2>
                         </header> */}
+                        {/* start  files categories */}
                         <ul role="list" className="divide-y divide-white/5">
                             <li className={"p-2"}>
                                 {
@@ -572,7 +668,7 @@ function IndexSistemaDeArchivos() {
                                                 <li className="px-4 py-3 sm:px-6 lg:px-8">
                                                     <div className="flex items-center gap-x-3">
                                                         { IconShow(item.url) }
-                                                        <h3 className="flex-auto truncate text-sm leading-6 text-gray-800 text-ellipsis"> 
+                                                        <h3 className="flex-auto truncate text-sm leading-6 text-gray-800 text-ellipsis">
                                                             { item.name } 
                                                         </h3>
                                                         <a 
@@ -587,8 +683,17 @@ function IndexSistemaDeArchivos() {
                                                             >
                                                             <EyeIcon className={"mx-auto text-gray-400 h-5 w-5 flex-shrink-0 hover:text-green-500 rounded-full"} style={{ cursor: 'pointer' }} />
                                                         </a>
+                                                        {
+                                                            permissionsValue ?
+                                                                <>
+                                                                <span className="flex-none text-xs text-gray-600">
+                                                                    <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-white rounded-full"} onClick={() => removeItem(item.name, false, item.url)} style={{ cursor: 'pointer' }} />
+                                                                    </span>
+                                                                </> : null
+                                                        }
+
                                                         <span className="flex-none text-xs text-gray-600">
-                                                        <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-red-600 rounded-full"} onClick={() => removeItem(item.name, false, item.url)} style={{ cursor: 'pointer' }} />
+                                                            <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-red-600 rounded-full"} onClick={() => removeItem(item.name, false, item.url)} style={{ cursor: 'pointer' }} />
                                                         </span>
                                                     </div>
                                                 </li>
@@ -599,6 +704,7 @@ function IndexSistemaDeArchivos() {
                                 
                             }
                         </ul>
+                         {/* end  files categories */}
                     </div>
             </div>
           </div>
@@ -608,23 +714,24 @@ function IndexSistemaDeArchivos() {
 
       <ModalComponents
         isOpen={show}
+
         onClose={() => {
           setShow(false);
+          setSelectedItems([]);
+          setIsOpen(false);
         }}
       >
-        <div className="isolate bg-white p-6">
+        <div className="isolate bg-white p-2" onClick={() =>isOpen === true ? setIsOpen(false) : null}>
           <div>
             <div className="px-4 sm:px-0">
               <h3 className="text-base font-medium text-gray-700">
                 Agregar  {typeFileSelect === 'file' ? 'Archivo' : 'Carpeta'} a  <br/>(
                     {departments.length ? departments.find((item: any) => String(item.id) === String(fileSelect))?.name : 'Nombre no disponible' })
               </h3>
-
               <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-500">
                 Este panel es tanto para agregar archivos y carpetas.
               </p>
             </div>
-            
             <hr className="p-4" />
             <div className="grid grid-cols-1 gap-4">
               <div>
@@ -670,8 +777,96 @@ function IndexSistemaDeArchivos() {
                             </div>
                         </div>
                     </div>
-                </>: null
+                </> : <>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className='px-2'>
+                            <label id="listbox-label" className="block text-sm font-medium text-gray-900">
+                                Seleccione Grupos
+                            </label>
+                            <div className="relative p-2">
+                                <button
+                                    type="button"
+                                    className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
+                                    aria-haspopup="listbox"
+                                    aria-expanded={isOpen}
+                                    aria-labelledby="listbox-label"
+                                    onClick={() => setIsOpen(!isOpen)}
+                                >
+                                    <span className="block truncate">
+                                       { options.length ? 'Seleccione un Grupo' : 'No existen mas opciones' }
+                                    </span>
+                                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <svg
+                                        className="h-5 w-5 text-gray-400"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                        aria-hidden="true"
+                                        >
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
+                                            clipRule="evenodd"
+                                        />
+                                        </svg>
+                                    </span>
+                                </button>
+
+                                {isOpen && (
+                                    <ul
+                                        className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                                        role="listbox"
+                                        aria-labelledby="listbox-label"
+                                        style={{ height: '100px' }}
+                                    >
+                                        {options.filter((option: string) => !selectedItems.includes(option)).map((option) => (
+                                            <>
+                                                <li
+                                                    key={option}
+                                                    className="relative cursor-default select-none py-2 pl-4 pr-4 text-gray-900"
+                                                    role="option"
+                                                    onClick={() => handleSelect(option)}
+                                                >
+                                                    <span className="block truncate font-normal border-b-2" style={{ cursor: 'pointer' }}>{ option }</span>
+                                                </li>
+                                            </>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        </div>
+                        <div>
+                            <h2 className="text-sm font-medium text-gray-900">Grupos Asignados al directorio</h2>
+                            <table className={"min-w-full divide-y divide-gray-300"}>
+                                <thead>
+                                    <tr>
+                                        <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
+                                            <span className="sr-only">Eliminar</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <div className='max-h-40 overflow-y-auto'>
+                                    <tbody className="divide-y divide-gray-200 bg-white">
+                                        {
+                                            selectedItems.map((item: any) => (
+                                                <>
+                                                    <tr>
+                                                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0"> { item } </td>
+                                                        <td className="hidden whitespace-nowrap px-3 py-4 text-sm sm:table-cell">
+                                                            <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-gray-600 rounded-full"} onClick={() => handleRemove(item)} style={{ cursor: 'pointer' }} />
+                                                        </td>
+                                                    </tr>
+                                                </>
+                                            ))
+                                        }
+                                    </tbody>
+                                </div>
+                            </table>
+                        </div>
+
+                    </div>
+                </>
               }
+              <hr className='py-1' />
             </div>
           </div>
           <div className="flex justify-end py-5">
@@ -705,12 +900,20 @@ function IndexSistemaDeArchivos() {
           </div>
         </div>
       </ModalComponents>
-
-{/* Delete */}
-      <ModalComponents
+      {/* <ModalFullComponent isOpen={modalPdf} onClose={() => setModalPdf(!modalPdf)}>
+            <Worker workerUrl={`https://unpkg.com/pdfjs-dist/build/pdf.worker.min.js`}>
+                <Viewer
+                    fileUrl={'https://intranet00.blob.core.windows.net/intranet/SistemaDeArchivos/8/Doc.%20Test%201/1727545000915.pdf?sp=racwdli&st=2024-01-09T14:50:56Z&se=2030-01-01T22:50:56Z&spr=https&sv=2022-11-02&sr=c&sig=qJ4b8SBK2tbrYs%2FqiredY7upvK1lWVLF3nN0VdGaEfE%3D'}
+                    plugins={[defaultLayoutPluginInstance]}
+                />
+            </Worker>
+      </ModalFullComponent> */}
+    {/* Delete */}
+      {/* <ModalComponents
         isOpen={showDelete}
         onClose={() => {
             setShowDelete(false);
+            setNameRemove('');
         }}
       >
         <>
@@ -719,12 +922,14 @@ function IndexSistemaDeArchivos() {
                     <div className="text-base text-center text-gray-600">
                         <p>Quieres eliminar el documento</p>
                         <p className='text-gray-900 font-medium'>{NameRemove}</p>
-                    </div> 
-                    <div><TrashIcon className='h-12 mb-5 mt-5 text-red-600'/></div>
+                    </div>
+                    <div>
+                        <TrashIcon className='h-12 mb-5 mt-5 text-red-600'/>
+                    </div>
                 </div>
                 <div className="grid grid-cols-1 gap-4">
                         <div className="flex justify-end">
-                            { preloading ?
+                            { reloadDelete ?
                                 <>
                                     <button type="button" className={`bg-parvalColor rounded  px-3 py-2 text-[14px] font-normal text-slate-700  hover:bg-yellow-500`} disabled>
                                         <svg aria-hidden="true" className="inline w-8 h-8 px-1 text-gray-200 animate-spin dark:text-white fill-yellow-400" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -742,19 +947,20 @@ function IndexSistemaDeArchivos() {
                                             size="mt-5 md:mt-0 h-10"
                                             color={`${NameRemove === '' ? 'bg-gray-300' : 'bg-red-500 text-white' }`}
                                         />
-                                    } 
+                                    }
                                 </> }
                         </div>
                 </div>
             </div>
-            
+
         </>
-      </ModalComponents>
+      </ModalComponents> */}
 
       <ModalComponents
         isOpen={showEdit}
         onClose={() => {
           setShowEdit(false);
+          setSelectedItems([]);
         }}
       >
         <>

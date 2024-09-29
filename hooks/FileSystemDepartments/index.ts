@@ -57,5 +57,13 @@ export function useFileSystemDepartments() {
                 }
             });
         },
+        async sendNotificationFileSystemDepartments(data: any){
+            console.log(data, 'data')
+            await postAll(`${urlApis.API_INTRENET}/send-notification-new-folders`, data).then(async (res: any) => {
+                if (res.status === 200){
+                    return { send: true }
+                }
+            });
+        },
     }
 }

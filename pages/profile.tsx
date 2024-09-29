@@ -17,7 +17,7 @@ import axios from 'axios';
 
 const stepPage: number = 6;
 
-function ProfileComponents() {
+export default function Profile() {
   const { getAuthLogin } = useAuthLogin();
   const [file, setFile] = useState(null);
   const [ loading, setLoading ] = useState(false);
@@ -43,11 +43,11 @@ function ProfileComponents() {
       ]);
       setLoading(false);
     }
-    if(isEmpty(vacations) || isEmpty(authLogin)) {
+    if(isEmpty(vacations)) {
       fetchData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLogin]);
+  }, []);
 
   useEffect(() => {
     if(!isEmpty(clearVacations)) {
@@ -417,11 +417,3 @@ function ProfileComponents() {
     </>
   );
 }
-
-export default function Profile() {
-  return (
-    <>
-      <ProfileComponents />
-    </>
-  )
-};

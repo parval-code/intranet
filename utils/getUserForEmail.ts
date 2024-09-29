@@ -5,6 +5,7 @@ import {
 
 export const GetUserForEmail = async (accounts: any, instance: any, email: string) => {
     try {
+
         const authProvider: AuthenticationProvider = {
             getAccessToken: async (request: any) => {
                 const response = await instance.acquireTokenSilent({
@@ -19,6 +20,7 @@ export const GetUserForEmail = async (accounts: any, instance: any, email: strin
                 }
             },
         };
+
         const graphClient = Client.initWithMiddleware({
             authProvider,
         });
@@ -26,7 +28,7 @@ export const GetUserForEmail = async (accounts: any, instance: any, email: strin
         const user = await graphClient.api(`/users/${email}`).get();
 
         return {
-            value: user,
+            data: user,
         };
 
     } catch (error) {

@@ -13,6 +13,7 @@ import { NotificationProvider } from './Notifications';
 import StoreProviderUsersPermissions from './usersPermissions/StoreProvider';
 import StoreProviderHappinnessDays from './HappinnessDays/StoreProvider';
 import StoreProviderFileSystemDepartments from './FileSystemDepartments/StoreProvider';
+import StoreProviderAssignedUserGroups from "./assignedUserGroups/StoreProvider";
 
 
 export default function GlobalProviders({ children } : any) {
@@ -32,9 +33,11 @@ export default function GlobalProviders({ children } : any) {
                                                         <StoreProviderUsersPermissions>
                                                             <StoreProviderHappinnessDays>
                                                                 <StoreProviderFileSystemDepartments>
+                                                                    <StoreProviderAssignedUserGroups>
                                                                         {
                                                                             children
                                                                         }
+                                                                    </StoreProviderAssignedUserGroups>
                                                                 </StoreProviderFileSystemDepartments>
                                                             </StoreProviderHappinnessDays>
                                                         </StoreProviderUsersPermissions>

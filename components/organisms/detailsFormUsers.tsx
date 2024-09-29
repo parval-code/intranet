@@ -5,6 +5,7 @@ import Image from "next/image";
 import { get, set, isEmpty } from 'lodash';
 import ModalUserPermis from '@/components/organisms/modalUserPermis';
 import ListPermis from '@/components/molecules/listPermis';
+import { TrashIcon } from '@heroicons/react/24/outline';
 
 interface DetailsFormUsersProps {
     permissions?: any[];
@@ -14,6 +15,7 @@ interface DetailsFormUsersProps {
     updatedPerson: any;
     selectedPermissions: any[];
     updateUsersPermissions: any;
+    updateUsersGroups?: any;
     saveUsersPermissions: any;
     showNotification: any;
     action?: any;
@@ -26,8 +28,19 @@ const DetailsFormUsers: React.FC<DetailsFormUsersProps> = (props: DetailsFormUse
     const [loading, setLoading] = useState(false);
     const [previewURL, setPreviewURL] = useState<string | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
+    const [modalGroupsOpen, setModalGroupsOpen] = useState(false);
     const [file, setFile] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
     const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+    const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
+    const [options, setOptions] = useState<string[]>([
+      'STAFF',
+      'SENIOR',
+      'MANAGER',
+      'SENIOR MANAGER',
+      'DIRECTOR'
+    ]);
+
     const [ newUser, setNewUser ]: any = useState({
         name: '',
         area: '',
@@ -36,6 +49,15 @@ const DetailsFormUsers: React.FC<DetailsFormUsersProps> = (props: DetailsFormUse
         admissionDate: null,
         birthdate: null
       });
+
+    const handleSelect = (item: string) => {
+      setSelectedGroups([...selectedGroups, item]);
+      setIsOpen(false);
+    };
+    
+    const handleRemove = (item: string) => {
+      setSelectedGroups(selectedGroups.filter(selected => selected !== item));
+    };
 
     useEffect(() => {
         if(!isEmpty(props.user)) {
@@ -50,11 +72,11 @@ const DetailsFormUsers: React.FC<DetailsFormUsersProps> = (props: DetailsFormUse
         }
       }, [props.user]);
 
-      useEffect(() => {
+    useEffect(() => {
         if(!isEmpty(props.selectedPermissions)) {
           setSelectedPermissions(props.selectedPermissions[0].permissions)
         }
-      }, [props.selectedPermissions]);  
+    }, [props.selectedPermissions]);  
 
     const clearInfo = () => {
       setNewUser({
@@ -78,7 +100,7 @@ const DetailsFormUsers: React.FC<DetailsFormUsersProps> = (props: DetailsFormUse
         const { name, value } = e.target;
         setNewUser((newUser: any) => ({...newUser, [name]: value}));
     }
-    console.log(file, 'file')
+    
     const handleUpload = async () => {
       if (!file) {
           console.error('Selecciona un archivo antes de cargar');
@@ -114,7 +136,7 @@ const DetailsFormUsers: React.FC<DetailsFormUsersProps> = (props: DetailsFormUse
       }
   };
 
-    const onHandleUpdatedUserPermissions = async () => {
+  const onHandleUpdatedUserPermissions = async () => {
         let dataFrontPage: string = '';
         let image: boolean = false;
         const data: any = {
@@ -128,15 +150,22 @@ const DetailsFormUsers: React.FC<DetailsFormUsersProps> = (props: DetailsFormUse
           if(dataS) {
             set(data, 'urlImage', dataS);
           }
-          console.log('one');   
           image = true;
         } catch(e: any) {
           dataFrontPage = '';
           image = true;
         }
-        console.log('two');   
+
         setLoading(true);
         await props.updatedPerson(props.user.id, data).then(async () => {
+          try {
+            await props.updateUsersGroups({
+              personId: props.user.userId,
+              groups: selectedGroups,
+            })
+          } catch(e) {
+            console.log(e)
+          }
           if(!isEmpty(props.selectedPermissions)) {
             await props.updateUsersPermissions(props.selectedPermissions[0].id, {
               userId: props.user.userId,
@@ -159,7 +188,7 @@ const DetailsFormUsers: React.FC<DetailsFormUsersProps> = (props: DetailsFormUse
             })
           }
         });
-      }
+  }
     return (
         <>
             {
@@ -370,6 +399,34 @@ const DetailsFormUsers: React.FC<DetailsFormUsersProps> = (props: DetailsFormUse
                                           </li>
                                         </ul>
                                     </div>
+                                    <div>
+                                        <h3 className="font-medium text-gray-900"> Lista Grupos Asignados</h3>
+                                        <ul role="list" className="mt-2 divide-y divide-gray-200 border-b border-t border-gray-200">
+                                          {
+                                            selectedGroups && selectedGroups.map((item: any) => (
+                                              <>
+                                                  <li className="flex items-center justify-between py-3">
+                                                      <div className="flex items-center">
+                                                        <p className="ml-4 text-sm font-medium text-gray-900">{ item }</p>
+                                                      </div>
+                                                  </li>
+                                              </>
+                                            ))
+                                          }
+                                          <li className="flex items-center justify-between py-2">
+                                              <button type="button" onClick={() => setModalGroupsOpen(true)} style={{ cursor: 'pointer' }}  className="group -ml-1 flex items-center rounded-md bg-white p-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                                <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-gray-300 text-gray-400">
+                                                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                                    <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                                                    </svg>
+                                                </span>
+                                                <span className="ml-4 text-sm font-medium text-gray-600 group-hover:text-gray-500">
+                                                    Agregar o remover Grupos 
+                                                  </span>
+                                              </button>
+                                          </li>
+                                        </ul>
+                                    </div>
                                     <div className="flex">
                                           {
                                             loading ?
@@ -409,6 +466,103 @@ const DetailsFormUsers: React.FC<DetailsFormUsersProps> = (props: DetailsFormUse
                     selectedPermissions={selectedPermissions} 
                     setSelectedPermissions={setSelectedPermissions} />
             </ModalUserPermis>
+
+
+              <ModalUserPermis isOpen={modalGroupsOpen} onClose={() => setModalGroupsOpen(false)}>
+                <>
+                    <div className="isolate bg-white p-2 flex">
+                        <div className="webkit-center px-4 pb-5 sm:px-0 items-center">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className='px-2'>
+                                <label id="listbox-label" className="block text-sm font-medium text-gray-900">
+                                    Seleccione Grupos
+                                </label>
+                                <div className="relative p-2">
+                                    <button
+                                        type="button"
+                                        className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-600 sm:text-sm"
+                                        aria-haspopup="listbox"
+                                        aria-expanded={isOpen}
+                                        aria-labelledby="listbox-label"
+                                        onClick={() => setIsOpen(!isOpen)}
+                                    >
+                                        <span className="block truncate">
+                                          { options.length ? 'Seleccione un Grupo' : 'No existen mas opciones' }
+                                        </span>
+                                        <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                            <svg
+                                            className="h-5 w-5 text-gray-400"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                            aria-hidden="true"
+                                            >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
+                                                clipRule="evenodd"
+                                            />
+                                            </svg>
+                                        </span>
+                                    </button>
+
+                                    {isOpen && (
+                                        <ul
+                                            className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
+                                            role="listbox"
+                                            aria-labelledby="listbox-label"
+                                            style={{ height: 'auto' }}
+                                        >
+                                            {options.filter((option: string) => !selectedGroups.includes(option)).map((option) => (
+                                                <>
+                                                    <li
+                                                        key={option}
+                                                        className="relative cursor-default select-none py-2 pl-4 pr-4 text-gray-900"
+                                                        role="option"
+                                                        onClick={() => handleSelect(option)}
+                                                    >
+                                                        <span className="block truncate font-normal border-b-2" style={{ cursor: 'pointer' }}>{ option }</span>
+                                                    </li>
+                                                </>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            </div>
+                            <div>
+                                <h2 className="text-sm font-medium text-gray-900">Grupos Asignados al directorio</h2>
+                                <table className={"min-w-full divide-y divide-gray-300"}>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
+                                                <span className="sr-only">Eliminar</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <div className='max-h-72 overflow-y-auto'>
+                                        <tbody className="divide-y divide-gray-200 bg-white">
+                                            {
+                                                selectedGroups.map((item: any) => (
+                                                    <>
+                                                        <tr>
+                                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0"> { item } </td>
+                                                            <td className="hidden whitespace-nowrap px-3 py-4 text-sm sm:table-cell">
+                                                                <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-gray-600 rounded-full"} onClick={() => handleRemove(item)} style={{ cursor: 'pointer' }} />
+                                                            </td>
+                                                        </tr>
+                                                    </>
+                                                ))
+                                            }
+                                        </tbody>
+                                    </div>
+                                </table>
+                            </div>
+
+                          </div>
+                        </div>
+                    </div>
+
+                </>
+              </ModalUserPermis>
         </>
     )
 }
