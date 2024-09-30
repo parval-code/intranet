@@ -197,7 +197,13 @@ function IndexSistemaDeArchivos() {
                                     type: 'file',
                                     url: infoImege.data.urlImage,
                                 });
-                                onUpdateFileSystem();
+                                onUpdateFileSystem().then(async (res: any) => {
+                                    console.log(res)
+                                    if(res.success) {
+                                        console.log(res.data, 'res.data', res)
+                                        await sendNotificationFileSystemDepartments({ name: `${folderSelect}/${fileName}`, departament: fileSelect, grupos: selectedItems })
+                                    }
+                                });;
                             }
                         };
                 
@@ -219,13 +225,7 @@ function IndexSistemaDeArchivos() {
                     permissions: selectedItems,
                     document: [],
                 });
-                onUpdateFileSystem().then(async (res: any) => {
-                    console.log(res)
-                    if(res.success) {
-                        console.log(res.data, 'res.data', res)
-                        await sendNotificationFileSystemDepartments({ name: fileName, departament: fileSelect, grupos: selectedItems })
-                    }
-                });
+                onUpdateFileSystem()
             } catch(e) {
                 console.log(e)
             }
