@@ -576,24 +576,23 @@ function IndexSistemaDeArchivos() {
                                                                             }
                                                                         </>
                                                                     </li>
+                                                            </>  : null
+                                                            // <>
+                                                            //     <li key={index} className={'relative px-4 py-2 sm:px-6 lg:px-8 bg-gray-50'}>
+                                                            //         <LockClosedIcon className="absolute left-1/2 transform -translate-x-1/2 mx-auto text-parvalColor h-7 w-7 flex-shrink-0 rounded-full" />
                                                                 
-                                                                
-                                                            </> : <>
-                                                                <li key={index} className={'relative px-4 py-2 sm:px-6 lg:px-8 bg-gray-50'}>
-                                                                    <LockClosedIcon className="absolute left-1/2 transform -translate-x-1/2 mx-auto text-parvalColor h-7 w-7 flex-shrink-0 rounded-full" />
-                                                                
-                                                                    <div className="flex items-center gap-x-3">
-                                                                        {item.name === folderSelect ? (
-                                                                        <FolderOpenIcon className="mx-auto text-parvalColor h-7 w-7 flex-shrink-0 rounded-full" />
-                                                                        ) : (
-                                                                        <FolderIcon className="mx-auto text-gray-400 h-7 w-7 flex-shrink-0 rounded-full" />
-                                                                        )}
-                                                                        <h3 className="flex-auto truncate text-sm leading-6 text-gray-800">
-                                                                        {item.name}
-                                                                        </h3>
-                                                                    </div>
-                                                                </li>
-                                                            </>
+                                                            //         <div className="flex items-center gap-x-3">
+                                                            //             {item.name === folderSelect ? (
+                                                            //             <FolderOpenIcon className="mx-auto text-parvalColor h-7 w-7 flex-shrink-0 rounded-full" />
+                                                            //             ) : (
+                                                            //             <FolderIcon className="mx-auto text-gray-400 h-7 w-7 flex-shrink-0 rounded-full" />
+                                                            //             )}
+                                                            //             <h3 className="flex-auto truncate text-sm leading-6 text-gray-800">
+                                                            //             {item.name}
+                                                            //             </h3>
+                                                            //         </div>
+                                                            //     </li>
+                                                            // </>
 
                                                     }
                                                     
@@ -692,9 +691,9 @@ function IndexSistemaDeArchivos() {
                                                                 </> : null
                                                         }
 
-                                                        <span className="flex-none text-xs text-gray-600">
+                                                        {/* <span className="flex-none text-xs text-gray-600">
                                                             <TrashIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-red-600 rounded-full"} onClick={() => removeItem(item.name, false, item.url)} style={{ cursor: 'pointer' }} />
-                                                        </span>
+                                                        </span> */}
                                                     </div>
                                                 </li>
                                             </> 
