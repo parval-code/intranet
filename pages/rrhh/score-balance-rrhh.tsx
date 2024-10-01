@@ -58,12 +58,12 @@ export default function ScoreBalanceRrhh() {
 
   return (
     <div className="p-10">
-      <p className=" text-center relative top-1 font-normal text-xl mb-3">Lista de departamentos</p>
+      <p className="relative top-1 font-normal text-xl mb-3">Lista de departamentos</p>
 
       {/* SearchInput onChange actualiza el valor de búsqueda */}
       <SearchInput
         placeholder={'Buscar departamento'}
-        onChange={e => setSearchTerm(e.target.value)}
+        onChange={(e: { target: { value: React.SetStateAction<string>; }; }) => setSearchTerm(e.target.value)}
       />
 
       <div className="mt-5">
@@ -79,7 +79,7 @@ export default function ScoreBalanceRrhh() {
               />
             ))
           ) : (
-            <p>No se encontraron departamentos</p>
+            <p className='mt-10'>No se encontraron departamentos</p>
           )}
         </div>
       </div>
