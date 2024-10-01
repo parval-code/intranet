@@ -20,6 +20,7 @@ export const routes: any[] = [
     current: false,
     dropdownOptions: [
       // { name: 'Calendario parval', href: '/calendario', },
+      { name: 'Score balance', href: '/rrhh/score-balance-rrhh', },
       { name: 'Solicitudes', href: '/rrhh/solicitudes', },
       { name: 'Aprobacion RRHH', href: '/aprobacion-rrhh', },
       { name: 'Aprobacion supervisor', href: '/aprobacion-supervisor', },
