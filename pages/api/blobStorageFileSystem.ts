@@ -14,9 +14,9 @@ const azureBlobStorage = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).end();
   }
 
-  const { fileType, containerRoute }: any = req.query;
+  const { fileType, containerRoute, fileName }: any = req.query;
   const { base64Image } = req.body;
-  console.log(fileType);
+  // console.log(fileType);
   const blobStorageUrl = 'https://intranet00.blob.core.windows.net';
   const token = 'sp=racwdli&st=2024-01-09T14:50:56Z&se=2030-01-01T22:50:56Z&spr=https&sv=2022-11-02&sr=c&sig=qJ4b8SBK2tbrYs%2FqiredY7upvK1lWVLF3nN0VdGaEfE%3D';
  
@@ -43,7 +43,8 @@ const azureBlobStorage = async (req: NextApiRequest, res: NextApiResponse) => {
   };
 
   const typeImage: string = mimeToExtension[fileType] || 'bin';
-  const blobName = `${cleanedContainerRoute}/${Date.now()}.${typeImage.trim()}`;
+  const modifyFileName = fileName.replace(/ /g, "_");
+  const blobName = `${cleanedContainerRoute}/${modifyFileName}-${Date.now()}.${typeImage.trim()}`;
 
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 

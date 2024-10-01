@@ -28,6 +28,7 @@ import {
 import { WORDIcons, PDFIcons, XLSIcons } from '@/components/molecules/DesingIcons';
 import VerificatePermissions, { VerificateEnabledGroup } from  '@/utils/verificatePermissions';
 import Permissions from '@/utils/permissions';
+import { GetFormatDateAndYear } from '@/utils/getMonthForDate';
 
 interface IFilePlus {
   name: string;
@@ -189,16 +190,19 @@ function IndexSistemaDeArchivos() {
                         let infoImege: any;
                         reader.onloadend = async () => {
                             const base64Image = reader.result.split(',')[1];
-                            infoImege = await axios.post(`/api/blobStorageFileSystem?fileType=${get(file, 'type', '')}&containerRoute=${fileSelect}/${folderSelect}`, {base64Image});
+                            infoImege = await axios.post(`/api/blobStorageFileSystem?fileType=${get(file, 'type', '')}&containerRoute=${fileSelect}/${folderSelect}&fileName=${fileName}`, {base64Image});
                     
                             if(infoImege.data.urlImage) {
                                 await updatedData[fileSelect][folderIndex].document?.push({
                                     name: fileName,
                                     type: 'file',
+                                    date: new Date(),
+                                    userName: get(authLogin, 'displayName', ''),
+                                    userId: get(authLogin, 'id', ''),
                                     url: infoImege.data.urlImage,
                                 });
                                 onUpdateFileSystem().then(async (res: any) => {
-                                    console.log(res)
+                                    // console.log(res)
                                     if(res.success) {
                                         console.log(res.data, 'res.data', res)
                                         await sendNotificationFileSystemDepartments({ name: `${folderSelect}/${fileName}`, departament: fileSelect, grupos: selectedItems })
@@ -207,7 +211,7 @@ function IndexSistemaDeArchivos() {
                             }
                         };
                 
-                        console.log('Imagen cargada con éxito');
+                        // console.log('Imagen cargada con éxito');
                 
                         return {
                         success: true,
@@ -222,6 +226,9 @@ function IndexSistemaDeArchivos() {
                 updatedData[fileSelect].push({
                     name: fileName,
                     type: 'folder',
+                    date: new Date(),
+                    userName: get(authLogin, 'displayName', ''),
+                    userId: get(authLogin, 'id', ''),
                     permissions: selectedItems,
                     document: [],
                 });
@@ -346,9 +353,12 @@ function IndexSistemaDeArchivos() {
         // Si estamos en el directorio principal
         if (folderSelect) {
           const folderIndex = updatedData[fileSelect].findIndex((item: IFilePlus) => item.name === oldFolderName);
-      
+
           if (folderIndex !== -1) {
             updatedData[fileSelect][folderIndex].name = newFolderName;
+            updatedData[fileSelect][folderIndex].date = new Date();
+            updatedData[fileSelect][folderIndex].userName = get(authLogin, 'displayName', '');
+            updatedData[fileSelect][folderIndex].userId = get(authLogin, 'id', '');
             // updatedData[fileSelect][folderIndex].permissions = selectedItems;
           }
         }
@@ -364,6 +374,7 @@ function IndexSistemaDeArchivos() {
   };
 
   useEffect(() => {
+    console.log(authLogin);
     if(!isEmpty(authLogin) && !isEmpty(departments)) {
         const category = departments.find((item: any) => item.manager === authLogin.id);
         if(!isEmpty(category)) {
@@ -559,10 +570,14 @@ function IndexSistemaDeArchivos() {
                                                                                                     <FolderIcon className={"mx-auto text-gray-400 h-7 w-7 flex-shrink-0 rounded-full"} />
                                                                                                 </>
                                                                                         }
-
-                                                                                        <h3 className="flex-auto truncate text-sm leading-6 text-gray-800"> { item.name } </h3>
+                                                                                        <div className="flex-auto truncate leading-4">
+                                                                                            <h3 className="text-sm text-gray-800 truncate"> { item.name } </h3>
+                                                                                            <h3 className="text-gray-800" style={{ fontSize: '8px' }}> { !isEmpty(get(item, 'date', null))  ? `${GetFormatDateAndYear(get(item, 'date', ''))} por ${get(item, 'userName', '')}` : null } </h3>
+                                                                                        </div>
+                                                                                        
                                                                                         <span className="flex gap-5 text-xs text-gray-600">
 
+                                                                                           {permissionsValue ? <>
                                                                                             <PencilIcon className={"mx-auto text-gray-400 h-5 w-5 hover:text-green-400 rounded-full"} onClick={() => setShowEdit(true)} style={{ cursor: 'pointer' }} />
                                                                                             {
                                                                                                 !isEmpty(item.document) ? null :
@@ -570,7 +585,8 @@ function IndexSistemaDeArchivos() {
                                                                                                         setShowDelete(true)
                                                                                                         setNameRemove(item.name);
                                                                                                     }} style={{ cursor: 'pointer' }} />
-                                                                                            }                                            
+                                                                                            } 
+                                                                                           </> : null }                                           
                                                                                         </span>
                                                                                     </div>
                                                                             }
@@ -667,9 +683,11 @@ function IndexSistemaDeArchivos() {
                                                 <li className="px-4 py-3 sm:px-6 lg:px-8">
                                                     <div className="flex items-center gap-x-3">
                                                         { IconShow(item.url) }
-                                                        <h3 className="flex-auto truncate text-sm leading-6 text-gray-800 text-ellipsis">
-                                                            { item.name } 
-                                                        </h3>
+                                                        <div className={'flex-auto truncate leading-4'}>
+                                                            <h3 className="text-sm text-gray-800 truncate">{ item.name }</h3>
+                                                            <span className="text-gray-700" style={{ fontSize: '8px' }}>{ !isEmpty(get(item, 'date', null)) ? `${GetFormatDateAndYear(get(item, 'date', ''))} por ${get(item, 'userName', '')}` : null } </span>
+                                                        </div>
+                                                        
                                                         <a 
                                                             href={item.url}
                                                             target="_blank"

@@ -61,6 +61,9 @@ const DetailsFormUsers: React.FC<DetailsFormUsersProps> = (props: DetailsFormUse
 
     useEffect(() => {
         if(!isEmpty(props.user)) {
+          if(!isEmpty(props.user.group)){
+            setSelectedGroups(props.user.group);
+          }
           setNewUser({
             name: props.user.name,
             jobTitle: props.user.jobTitle,
