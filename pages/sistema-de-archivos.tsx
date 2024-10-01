@@ -516,7 +516,7 @@ function IndexSistemaDeArchivos() {
                                                         className={"block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"} />
                                                 </div>
                                                 <div>
-                                                    <button
+                                                { permissionsValue ? <button
                                                         onClick={() => {
                                                             setShow(true)
                                                             setTypeFileSelect('folder')
@@ -526,7 +526,7 @@ function IndexSistemaDeArchivos() {
                                                         disabled={fileSelect === ''}
                                                         className={`mt-5 mr-5 md:mt-0 h-9 flex items-center text-gray-800 rounded bg-parvalColor px-5 py-2 text-[14px] font-normal hover:bg-parvalColor`}>
                                                          <FolderPlusIcon className={"mx-auto text-gray-800 h-7 w-7 rounded-full"} />
-                                                    </button>
+                                                    </button> : null }
                                                 </div>
                                             </div>
                                         </> 
@@ -648,15 +648,15 @@ function IndexSistemaDeArchivos() {
                                                         className={"block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"} />
                                                 </div>
                                                 <div>
-                                                    <button
+                                                   { permissionsValue ? <button
                                                         onClick={() => {
                                                             setShow(true)
                                                             setTypeFileSelect('file')
                                                         }}
                                                         disabled={fileSelect === ''}
                                                         className={`mt-5 mr-5 md:mt-0 h-9 flex items-center  rounded bg-parvalColor px-5 py-2 text-[14px] font-normal text-slate-800`}>
-                                                        <CloudArrowUpIcon className={"mx-auto text-gray-700 h-7 w-7 "} />
-                                                    </button>
+                                                        <CloudArrowUpIcon className={"mx-auto text-gray-700 h-7 w-7 "} /> 
+                                                    </button> : null }
                                                 </div>
                                             </div>
                                             
