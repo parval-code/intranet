@@ -41,8 +41,10 @@ const CardDeparment: React.FC<CardDeparmentProps> = ({
         </div>
         
         {/* ProgressBar */}
-        <div>
-          <ProgresBar progressValue={progressValue} />
+          <div>
+            <ProgresBar progressValue={progressValue} />
+            {/* porcentaje dinámico */}
+            <p className='text-[0.9rem] font-light text-gray-600 mt-3'>{progressValue}%</p>
         </div>
       </div>
     </Link>
