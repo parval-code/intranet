@@ -29,6 +29,7 @@ import { WORDIcons, PDFIcons, XLSIcons } from '@/components/molecules/DesingIcon
 import VerificatePermissions, { VerificateEnabledGroup } from  '@/utils/verificatePermissions';
 import Permissions from '@/utils/permissions';
 import { GetFormatDateAndYear } from '@/utils/getMonthForDate';
+import ReadAllDocumentsComponents from '@/components/organisms/readAllDocuments';
 
 interface IFilePlus {
   name: string;
@@ -104,6 +105,8 @@ function IndexSistemaDeArchivos() {
   const [ permissionsValue, setPermissionsValue ] = useState(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [showDocumentRead, setShowDocumentRead] = useState(false);
+  const [documentRead, setDocumentRead] = useState('');
   const [options, setOptions] = useState<string[]>([
     'STAFF',
     'SENIOR',
@@ -688,7 +691,7 @@ function IndexSistemaDeArchivos() {
                                                             <span className="text-gray-700" style={{ fontSize: '8px' }}>{ !isEmpty(get(item, 'date', null)) ? `${GetFormatDateAndYear(get(item, 'date', ''))} por ${get(item, 'userName', '')}` : null } </span>
                                                         </div>
                                                         
-                                                        <a 
+                                                        {/* <a 
                                                             href={item.url}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
@@ -697,9 +700,12 @@ function IndexSistemaDeArchivos() {
                                                                 window.open(item.url, '_blank');
                                                             }}
                                                             download={true}
-                                                            >
-                                                            <EyeIcon className={"mx-auto text-gray-400 h-5 w-5 flex-shrink-0 hover:text-green-500 rounded-full"} style={{ cursor: 'pointer' }} />
-                                                        </a>
+                                                            > */}
+                                                        <EyeIcon onClick={() => {
+                                                            setShowDocumentRead(true);
+                                                            setDocumentRead(item.url);
+                                                        }} className={"mx-auto text-gray-400 h-5 w-5 flex-shrink-0 hover:text-green-500 rounded-full"} style={{ cursor: 'pointer' }} />
+                                                        {/* </a> */}
                                                         {
                                                             permissionsValue ?
                                                                 <>
@@ -972,6 +978,11 @@ function IndexSistemaDeArchivos() {
 
         </>
       </ModalComponents> */}
+
+        <ReadAllDocumentsComponents url={documentRead} open={showDocumentRead} close={() => {
+            setShowDocumentRead(false);
+            setDocumentRead('');
+        }} />
 
       <ModalComponents
         isOpen={showEdit}
