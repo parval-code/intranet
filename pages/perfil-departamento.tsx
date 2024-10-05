@@ -45,7 +45,7 @@ export default function perfilDepartamento() {
   const handleCalificacionClick = () => {
     if (showCalifica) {
       setShowCalifica(false); // Volver a mostrar la lista de objetivos
-      setButtonLabel('CALIFICACIÓN PEERS'); // Cambiar el texto del botón de vuelta
+      setButtonLabel('Calificación Peers'); // Cambiar el texto del botón de vuelta
     } else {
       setShowCalifica(true); // Mostrar "Califica tu team"
       setButtonLabel('Lista de Objetivos'); // Cambiar el texto del botón
@@ -98,9 +98,9 @@ export default function perfilDepartamento() {
 
         {/* Col charts and listing */}
         <div className="md:col-span-8 lg:col-span-6 col-span-8 col-start-0">
-            
+
           {/* Components charts */}
-          <div className='block md:flex gap-2 2xl:flex-row-reverse mb-4'>
+          <div className='block md:flex gap-2 2xl:flex-row-reverse mb-3'>
             <CircularChart progress={50} size={70} strokeWidth={10} label="Meta Financiera" />
             <br />
             <CircularChart progress={50} size={70} strokeWidth={10} label="Meta Financiera" />
