@@ -3,18 +3,20 @@ import PersonGroup from '@/components/atoms/personGroup';
 import CircularChart from '@/components/molecules/circular-chart-Props';
 import ListUiV2 from '@/components/molecules/listUiV2';
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function perfilDepartamento() {
+  const [showCalifica, setShowCalifica] = useState(false); // Estado para controlar la visualización
+  const [buttonLabel, setButtonLabel] = useState('CALIFICACIÓN PEERS'); // Estado para el texto del botón
 
-    // Equipo
+  // Equipo
   const imageUrls = [
     'https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
     'https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
     'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80',
   ];
 
-    // Lista de objetivos
+  // Lista de objetivos
   const objetivos = [
     {
       objetivoTitle: "Objetivo 1",
@@ -37,14 +39,18 @@ export default function perfilDepartamento() {
       objetivoEspecifico: "Revisión de procesos internos",
       progressValue: 30,
     },
-    {
-        objetivoTitle: "Objetivo 3",
-        metaOperativa: "Meta operativa 3",
-        fechaCierre: "Septiembre 2024",
-        objetivoEspecifico: "Revisión de procesos internos",
-        progressValue: 30,
-      },
   ];
+
+  // Función para manejar el clic en el botón
+  const handleCalificacionClick = () => {
+    if (showCalifica) {
+      setShowCalifica(false); // Volver a mostrar la lista de objetivos
+      setButtonLabel('CALIFICACIÓN PEERS'); // Cambiar el texto del botón de vuelta
+    } else {
+      setShowCalifica(true); // Mostrar "Califica tu team"
+      setButtonLabel('Lista de Objetivos'); // Cambiar el texto del botón
+    }
+  };
 
   return (
     <div className='p-10'>
@@ -52,7 +58,6 @@ export default function perfilDepartamento() {
         {/* Col Info person */}
         <div className="md:col-span-8 lg:col-span-2 col-span-8">
           <p className='text-xl mb-10'>Dirección de Riesgos</p>
-
           {/* Box picture profile and people */}
           <div>
             <span className="relative inline-block">
@@ -78,9 +83,13 @@ export default function perfilDepartamento() {
           {/* Btn group actions */}
           <div className='mt-10'>
             <div className='mb-4'>
-              <Btn label={'CALIFICACIÓN PEERS'} size={'w-full'} color={'bg-parvalColor'} />
+              <Btn 
+                label={buttonLabel} // 
+                onClick={handleCalificacionClick} // Llama a la función al hacer clic
+                size={'w-full'} 
+                color={'bg-parvalColor'} 
+              />
             </div>
-
             <Link href="/rrhh/score-balance-rrhh">
               <Btn label={'Volver atras'} size={'w-full'} color={'border-solid border-[1px] border-gray-300'} />
             </Link>
@@ -89,6 +98,7 @@ export default function perfilDepartamento() {
 
         {/* Col charts and listing */}
         <div className="md:col-span-8 lg:col-span-6 col-span-8 col-start-0">
+            
           {/* Components charts */}
           <div className='block md:flex gap-2 2xl:flex-row-reverse mb-4'>
             <CircularChart progress={50} size={70} strokeWidth={10} label="Meta Financiera" />
@@ -98,19 +108,25 @@ export default function perfilDepartamento() {
             <CircularChart progress={50} size={70} strokeWidth={10} label="Meta Financiera" />
           </div>
 
-          {/* Listing */}
-          <div className='overflow-scroll h-[560px] 2xl:h-[900px]'>
-            {objetivos.map((objeto, index) => (
-              <ListUiV2
-                key={index} // Usar un key único
-                objetivoTitle={objeto.objetivoTitle}
-                metaOperativa={objeto.metaOperativa}
-                fechaCierre={objeto.fechaCierre}
-                objetivoEspecifico={objeto.objetivoEspecifico}
-                progressValue={objeto.progressValue}
-              />
-            ))}
-          </div>
+          {/* Conditional rendering */}
+          {showCalifica ? (
+            <div>
+              <p>hi! papus</p>
+            </div>
+          ) : (
+            <div className='overflow-scroll h-[560px] 2xl:h-[900px]'>
+              {objetivos.map((objeto, index) => (
+                <ListUiV2
+                  key={index} // Usar un key único
+                  objetivoTitle={objeto.objetivoTitle}
+                  metaOperativa={objeto.metaOperativa}
+                  fechaCierre={objeto.fechaCierre}
+                  objetivoEspecifico={objeto.objetivoEspecifico}
+                  progressValue={objeto.progressValue}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
