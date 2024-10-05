@@ -16,6 +16,28 @@ export default function perfilDepartamento() {
     'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80',
   ];
 
+  // Datos de calificación Peers
+  const peers = [
+    {
+      name: 'Tom Cook',
+      id: '#09090',
+      photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+      position: 'Sub gerente de calidad y proceso',
+    },
+    {
+      name: 'Anna Roberts',
+      id: '#09123',
+      photo: 'https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+      position: 'Gerente de innovación',
+    },
+    {
+      name: 'Mark Green',
+      id: '#09234',
+      photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80',
+      position: 'Líder de proyectos',
+    },
+  ];
+
   // Lista de objetivos
   const objetivos = [
     {
@@ -54,7 +76,7 @@ export default function perfilDepartamento() {
 
   return (
     <div className='p-10'>
-      <div className="grid md:grid-cols-8 grid-rows-5 gap-10 h-10">
+      <div className="grid md:grid-cols-8 gap-10 lg:h-10 h-auto">
         {/* Col Info person */}
         <div className="md:col-span-8 lg:col-span-2 col-span-8">
           <p className='text-xl mb-10'>Dirección de Riesgos</p>
@@ -84,8 +106,8 @@ export default function perfilDepartamento() {
           <div className='mt-10'>
             <div className='mb-4'>
               <Btn 
-                label={buttonLabel} // 
-                onClick={handleCalificacionClick} // Llama a la función al hacer clic
+                label={buttonLabel}
+                onClick={handleCalificacionClick}
                 size={'w-full'} 
                 color={'bg-parvalColor'} 
               />
@@ -102,22 +124,62 @@ export default function perfilDepartamento() {
           {/* Components charts */}
           <div className='block md:flex gap-2 2xl:flex-row-reverse mb-3'>
             <CircularChart progress={50} size={70} strokeWidth={10} label="Meta Financiera" />
-            <br />
             <CircularChart progress={50} size={70} strokeWidth={10} label="Meta Financiera" />
-            <br />
             <CircularChart progress={50} size={70} strokeWidth={10} label="Meta Financiera" />
           </div>
 
           {/* Conditional rendering */}
           {showCalifica ? (
             <div>
-              <p>hi! papus</p>
+              <div className='text-[0.9rem] leading-6 my-8'>
+                <p className='font-semibold'>Califica tu equipo</p>
+                <p className='text-[0.8rem] text-gray-500'>Selecciona la persona de tu equipo que quieres calificar y asignadle un número</p>
+              </div>
+
+              {/* Calificacion peers */}
+              {peers.map((peer, index) => (
+                <div key={index} className='block md:flex items-center content-center justify-between p-4 border-solid border-[1px] rounded-md border-[#E0E2E5] mb-4'>
+                  {/* name,photo and ID */}
+                  <div className="flex items-center">
+                    <div>
+                      <img
+                        alt={peer.name}
+                        src={peer.photo}
+                        className="inline-block h-9 w-9 rounded-full"
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{peer.name}</p>
+                      <p className="text-sm text-gray-500 group-hover:text-gray-700">{peer.id}</p>
+                    </div>
+                  </div>
+
+                  {/* Cargo */}
+                  <div>
+                    <p className='text-sm'>{peer.position}</p>
+                  </div>
+
+                  {/* Calificación */}
+                  <div>
+                    <select
+                      id="calificacion"
+                      name="calificacion"
+                      defaultValue="Calificacion Peers"
+                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-parvalColor sm:text-sm sm:leading-6"
+                    >
+                      <option>Calificacion Peers</option>
+                      <option>2</option>
+                      <option>3</option>
+                    </select>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <div className='overflow-scroll h-[560px] 2xl:h-[900px]'>
               {objetivos.map((objeto, index) => (
                 <ListUiV2
-                  key={index} // Usar un key único
+                  key={index} 
                   objetivoTitle={objeto.objetivoTitle}
                   metaOperativa={objeto.metaOperativa}
                   fechaCierre={objeto.fechaCierre}
