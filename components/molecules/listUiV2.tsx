@@ -81,14 +81,14 @@ export default function ListUiV2({
               <p> {metaOperativa}</p>
             </div>
             <div>
-            <div className="mt-10">
+            <div className="mt-7">
               <p className='font-normal'>Fecha de cierre:</p>
               <p>{fechaCierre}</p>
             </div>
             </div>
         
             <div>
-             <div className="mt-10">
+             <div className="mt-7">
               <p className='font-normal'>Objetivo específico:</p>
               <p>{objetivoEspecifico}</p>
              </div>
