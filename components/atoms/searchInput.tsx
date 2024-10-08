@@ -12,7 +12,7 @@ interface ISearchInput {
 export default function SearchInput(props: ISearchInput) {
   return (
     <>
-     <div className='p-1 shadow-md rounded'>
+     <div className='p-1 pl-5 shadow-md rounded'>
         <div className="relative flex flex-1 p-1">
               <label htmlFor="search-field" className="sr-only">
                 Search
