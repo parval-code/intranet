@@ -1,3 +1,4 @@
+import { ScaleIcon } from '@heroicons/react/20/solid';
 import {
   FolderPlusIcon,
   ChartPieIcon,
@@ -12,6 +13,7 @@ const data = false;
 export const routes: any[] = [
   { name: 'Home', href: '/', icon: HomeIcon, current: false },
   { name: 'Parval te informa', href: '/noticias', icon: NewspaperIcon, current: false },
+  { name: 'Deparment Score', href: '/score-balance-deparment', icon: ScaleIcon, current: false },
   // { name: 'Denuncias', href: '/denuncias', icon: ChatBubbleBottomCenterTextIcon, current: false },
   {
     name: 'RRHH',
