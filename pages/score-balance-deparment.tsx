@@ -17,7 +17,7 @@ export default function ScoreBalanceDeparment() {
 
   return (
     <div className='p-10'>
-         <p className="relative top-1 font-normal text-[1.2rem] l mb-8">Lista de departamentos</p>
+         <p className="relative top-1 font-normal text-[1.2rem] l mb-8">Balance score</p>
          {/* card group balance */}
           <div className='block md:flex gap-2 mb-3'>
            <div className='mb-3'>
