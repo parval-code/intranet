@@ -1,17 +1,19 @@
+import SearchInput from '@/components/atoms/searchInput';
 import CircularChart from '@/components/molecules/circular-chart-Props'
 import TabsUi from '@/components/molecules/tabsUi'
-import ListObjectives from '@/components/organisms/ListObjectives';
+import ListObjectivesAssigned from '@/components/organisms/ListObjectivesAssigned';
+import ListObjetives from '@/components/organisms/ListObjetives';
 import React from 'react'
 
 export default function ScoreBalanceDeparment() {
     const tabs = [
         {
           label: 'Objetivos asignados',
-          content: <div><ListObjectives/></div>,
+          content: <div><ListObjectivesAssigned/></div>,
         },
         {
           label: 'Lista de objetivos',
-          content: <div>Manage your billing details here.</div>,
+          content: <div><SearchInput placeholder={'Buscar objetivos'}/><ListObjetives/></div>,
         },
       ];
 

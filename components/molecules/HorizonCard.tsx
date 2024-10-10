@@ -7,9 +7,10 @@ interface HorizonCardProps {
   cargo: string;
   departamento: string;
   progreso: number;
+  imageUrl: string; // Nuevo prop para la imagen
 }
 
-const HorizonCard: React.FC<HorizonCardProps> = ({ name, id, cargo, departamento, progreso }) => {
+const HorizonCard: React.FC<HorizonCardProps> = ({ name, id, cargo, departamento, progreso, imageUrl }) => {
   return (
     <div className='my-5 leading-7 p-4 block md:flex items-center content-center justify-between rounded border-solid border-[1px] border-[#E0E2E5]'>
       <div>
@@ -17,7 +18,7 @@ const HorizonCard: React.FC<HorizonCardProps> = ({ name, id, cargo, departamento
           <div>
             <img
               alt=""
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+              src={imageUrl} // Utiliza el prop imageUrl
               className="inline-block h-9 w-9 rounded-full"
             />
           </div>
